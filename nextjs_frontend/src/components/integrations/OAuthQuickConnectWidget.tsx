@@ -72,7 +72,7 @@ export default function OAuthQuickConnectWidget() {
           <p className="mt-1 text-xs text-slate-600">
             {backendBase
               ? `${connectedCount}/3 connected`
-              : "Backend URL not configured (set NEXT_PUBLIC_API_BASE or NEXT_PUBLIC_BACKEND_URL)."}
+              : "Backend URL not configured (set NEXT_PUBLIC_API_BASE_URL, or legacy NEXT_PUBLIC_API_BASE / NEXT_PUBLIC_BACKEND_URL)."}
           </p>
         </div>
 

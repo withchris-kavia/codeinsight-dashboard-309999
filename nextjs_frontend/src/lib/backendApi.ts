@@ -2,6 +2,8 @@ import type { OAuthProvider } from "@/lib/oauthProviders";
 
 type JsonRecord = Record<string, unknown>;
 
+const DEFAULT_BACKEND_BASE_URL = "http://localhost:3001";
+
 function normalizeBaseUrl(value: string | undefined | null): string {
   if (!value) return "";
   return value.replace(/\/+$/, "");
@@ -10,18 +12,52 @@ function normalizeBaseUrl(value: string | undefined | null): string {
 // PUBLIC_INTERFACE
 export function getBackendBaseUrl(): string {
   /**
-   * Returns the backend base URL from environment variables.
+   * Returns the backend base URL from environment variables (NEXT_PUBLIC_* only).
    *
-   * IMPORTANT: Do not hardcode secrets here. This only reads NEXT_PUBLIC_* variables,
-   * as required.
+   * This app runs as a static export, so the backend base URL must be provided at build/runtime
+   * via environment variables.
    *
    * Preference order:
-   * - NEXT_PUBLIC_API_BASE
-   * - NEXT_PUBLIC_BACKEND_URL
+   * - NEXT_PUBLIC_API_BASE_URL (new, preferred)
+   * - NEXT_PUBLIC_API_BASE (legacy)
+   * - NEXT_PUBLIC_BACKEND_URL (legacy)
+   *
+   * If none are set, defaults to http://localhost:3001 (dev default).
    */
-  const apiBase = normalizeBaseUrl(process.env.NEXT_PUBLIC_API_BASE);
-  const backendUrl = normalizeBaseUrl(process.env.NEXT_PUBLIC_BACKEND_URL);
-  return apiBase || backendUrl || "";
+  const apiBaseUrl = normalizeBaseUrl(process.env.NEXT_PUBLIC_API_BASE_URL);
+  const apiBaseLegacy = normalizeBaseUrl(process.env.NEXT_PUBLIC_API_BASE);
+  const backendUrlLegacy = normalizeBaseUrl(process.env.NEXT_PUBLIC_BACKEND_URL);
+
+  return apiBaseUrl || apiBaseLegacy || backendUrlLegacy || DEFAULT_BACKEND_BASE_URL;
+}
+
+// PUBLIC_INTERFACE
+export function getFrontendBaseUrl(): string {
+  /**
+   * Returns the frontend base URL for display-only purposes.
+   *
+   * This should not be used for security decisions; it is only used to surface helpful
+   * callback URLs in the UI.
+   */
+  const env = normalizeBaseUrl(process.env.NEXT_PUBLIC_FRONTEND_URL);
+  if (env) return env;
+
+  // Client-side fallback (works for local dev/preview).
+  if (typeof window !== "undefined" && window.location?.origin) return window.location.origin;
+
+  return "http://localhost:3000";
+}
+
+// PUBLIC_INTERFACE
+export function getProviderFrontendCallbackUrl(provider: OAuthProvider): string {
+  /** Returns the suggested frontend OAuth callback URL for a provider (display-only). */
+  return `${getFrontendBaseUrl()}/auth/${provider}/callback`;
+}
+
+// PUBLIC_INTERFACE
+export function getProviderBackendCallbackUrl(provider: OAuthProvider): string {
+  /** Returns the backend OAuth callback URL for a provider (display-only). */
+  return `${getBackendBaseUrl()}/auth/${provider}/callback`;
 }
 
 async function safeReadJson(res: Response): Promise<JsonRecord | null> {
@@ -50,7 +86,9 @@ function extractErrorMessage(payload: JsonRecord | null, res: Response): string 
 async function apiGet<T>(path: string, params?: Record<string, string | undefined>): Promise<T> {
   const base = getBackendBaseUrl();
   if (!base) {
-    throw new Error("Backend URL is not configured. Set NEXT_PUBLIC_API_BASE or NEXT_PUBLIC_BACKEND_URL.");
+    throw new Error(
+      "Backend URL is not configured. Set NEXT_PUBLIC_API_BASE_URL (preferred) or NEXT_PUBLIC_API_BASE / NEXT_PUBLIC_BACKEND_URL."
+    );
   }
 
   const url = new URL(`${base}${path}`);
@@ -70,7 +108,9 @@ async function apiGet<T>(path: string, params?: Record<string, string | undefine
 async function apiPost<T>(path: string, body: unknown): Promise<T> {
   const base = getBackendBaseUrl();
   if (!base) {
-    throw new Error("Backend URL is not configured. Set NEXT_PUBLIC_API_BASE or NEXT_PUBLIC_BACKEND_URL.");
+    throw new Error(
+      "Backend URL is not configured. Set NEXT_PUBLIC_API_BASE_URL (preferred) or NEXT_PUBLIC_API_BASE / NEXT_PUBLIC_BACKEND_URL."
+    );
   }
 
   const url = new URL(`${base}${path}`);
@@ -124,7 +164,9 @@ export async function completeOAuthCallback(
    */
   const base = getBackendBaseUrl();
   if (!base) {
-    throw new Error("Backend URL is not configured. Set NEXT_PUBLIC_API_BASE or NEXT_PUBLIC_BACKEND_URL.");
+    throw new Error(
+      "Backend URL is not configured. Set NEXT_PUBLIC_API_BASE_URL (preferred) or NEXT_PUBLIC_API_BASE / NEXT_PUBLIC_BACKEND_URL."
+    );
   }
 
   const url = new URL(`${base}/auth/${provider}/callback`);

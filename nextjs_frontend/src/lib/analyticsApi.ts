@@ -73,7 +73,9 @@ async function safeReadJson(res: Response): Promise<JsonRecord | null> {
 async function apiGet<T>(path: string, params?: Record<string, string | undefined>): Promise<T> {
   const base = getBackendBaseUrl();
   if (!base) {
-    throw new Error("Backend URL is not configured. Set NEXT_PUBLIC_API_BASE or NEXT_PUBLIC_BACKEND_URL.");
+    throw new Error(
+      "Backend URL is not configured. Set NEXT_PUBLIC_API_BASE_URL (preferred) or NEXT_PUBLIC_API_BASE / NEXT_PUBLIC_BACKEND_URL."
+    );
   }
 
   const url = new URL(`${base}${path}`);

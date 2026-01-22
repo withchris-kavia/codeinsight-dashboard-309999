@@ -2,7 +2,12 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { OAUTH_PROVIDERS, type OAuthProvider } from "@/lib/oauthProviders";
-import { getBackendBaseUrl, startOAuthLogin } from "@/lib/backendApi";
+import {
+  getBackendBaseUrl,
+  getProviderBackendCallbackUrl,
+  getProviderFrontendCallbackUrl,
+  startOAuthLogin,
+} from "@/lib/backendApi";
 import { readProviderConnection } from "@/lib/oauthConnectionState";
 
 type ProviderUiState = {
@@ -145,6 +150,17 @@ export default function OAuthConnectionsPanel() {
                   </div>
 
                   <p className="mt-2 text-xs leading-relaxed text-slate-600">{p.description}</p>
+
+                  <div className="mt-2 space-y-1 text-[11px] text-slate-500">
+                    <div>
+                      Frontend callback:{" "}
+                      <code className="rounded bg-slate-100 px-1 py-0.5">{getProviderFrontendCallbackUrl(p.id)}</code>
+                    </div>
+                    <div>
+                      Backend callback:{" "}
+                      <code className="rounded bg-slate-100 px-1 py-0.5">{getProviderBackendCallbackUrl(p.id)}</code>
+                    </div>
+                  </div>
 
                   {s.connectedAt ? (
                     <div className="mt-2 text-[11px] text-slate-500">

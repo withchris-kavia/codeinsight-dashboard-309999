@@ -110,7 +110,9 @@ export default function AdminPage() {
               backendBase ? "border-slate-200 bg-white text-slate-700" : "border-rose-200 bg-rose-50 text-rose-800",
             ].join(" ")}
           >
-            {backendBase ? `Configured: ${backendBase}` : "Backend URL missing (set NEXT_PUBLIC_API_BASE or NEXT_PUBLIC_BACKEND_URL)"}
+            {backendBase
+              ? `Configured: ${backendBase}`
+              : "Backend URL missing (set NEXT_PUBLIC_API_BASE_URL, or legacy NEXT_PUBLIC_API_BASE / NEXT_PUBLIC_BACKEND_URL)"}
           </span>
         </div>
         <div className="mt-2 text-xs text-slate-600">{scopeHint}</div>

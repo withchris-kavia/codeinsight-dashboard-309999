@@ -1,3 +1,5 @@
+import OAuthQuickConnectWidget from "@/components/integrations/OAuthQuickConnectWidget";
+
 export default function DashboardPage() {
   return (
     <div className="space-y-6">
@@ -8,27 +10,35 @@ export default function DashboardPage() {
         </p>
       </header>
 
-      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        {[
-          { label: "Commits (7d)", value: "—" },
-          { label: "Pull Requests (7d)", value: "—" },
-          { label: "Merges (7d)", value: "—" },
-          { label: "Active Devs (7d)", value: "—" },
-        ].map((card) => (
-          <div
-            key={card.label}
-            className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm"
-          >
-            <div className="text-xs font-medium text-slate-500">{card.label}</div>
-            <div className="mt-2 text-2xl font-semibold text-slate-900">{card.value}</div>
-            <div className="mt-3 h-1.5 w-full rounded-full bg-slate-100">
+      <section className="grid gap-4 lg:grid-cols-3">
+        <div className="lg:col-span-2">
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            {[
+              { label: "Commits (7d)", value: "—" },
+              { label: "Pull Requests (7d)", value: "—" },
+              { label: "Merges (7d)", value: "—" },
+              { label: "Active Devs (7d)", value: "—" },
+            ].map((card) => (
               <div
-                className="h-1.5 w-1/3 rounded-full bg-gradient-to-r from-blue-500 to-cyan-500"
-                aria-hidden="true"
-              />
-            </div>
+                key={card.label}
+                className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm"
+              >
+                <div className="text-xs font-medium text-slate-500">{card.label}</div>
+                <div className="mt-2 text-2xl font-semibold text-slate-900">{card.value}</div>
+                <div className="mt-3 h-1.5 w-full rounded-full bg-slate-100">
+                  <div
+                    className="h-1.5 w-1/3 rounded-full bg-gradient-to-r from-blue-500 to-cyan-500"
+                    aria-hidden="true"
+                  />
+                </div>
+              </div>
+            ))}
           </div>
-        ))}
+        </div>
+
+        <div className="lg:col-span-1">
+          <OAuthQuickConnectWidget />
+        </div>
       </section>
 
       <section className="grid gap-4 lg:grid-cols-2">
